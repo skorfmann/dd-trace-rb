@@ -1,33 +1,35 @@
 require 'spec_helper'
 
+require 'ddtrace/transport/http'
 require 'ddtrace/transport/http/client'
-require 'ddtrace/transport/http/service'
 
 RSpec.describe Datadog::Transport::HTTP::Client do
-  subject(:client) { described_class.new(service, options) }
-  let(:options) { {} }
+  # TODO: Make this easier to initialize?
+  subject(:client) { described_class.new(apis, active_api) }
+  let(:apis) { instance_double(Datadog::Transport::HTTP::API::Map) }
+  let(:active_api) { double('active_api') }
 
-  describe '#deliver' do
-    subject(:response) { client.deliver(parcel) }
+  context 'default' do
+    subject(:client) { Datadog::Transport::HTTP.default(&options_block) }
+    let(:options_block) { proc { |_transport| } }
 
-    context 'given some traces' do
+    describe '#deliver' do
+      subject(:response) { client.deliver(request) }
+      let(:request) { Datadog::Transport::Request.new(:traces, parcel) }
       let(:parcel) { Datadog::Transport::Traces::Parcel.new(get_test_traces(2)) }
 
-      context 'with an actual service' do
-        let(:service) do
-          Datadog::Transport::HTTP::Service.new(
-            ENV.fetch('DD_AGENT_HOST', 'localhost'),
-            ENV.fetch('DD_TRACE_AGENT_PORT', 8126)
-          )
-        end
-
+      context 'to the default adapter' do
         it { expect(response.ok?).to be true }
       end
 
-      context 'with test service' do
-        let(:service) { FauxHTTPService.new }
+      context 'to the test adapter' do
+        let(:options_block) { proc { |t| t.adapter :test } }
         it { expect(response.ok?).to be true }
       end
     end
+  end
+
+  describe '#deliver' do
+    subject(:response) { client.deliver(request) }
   end
 end

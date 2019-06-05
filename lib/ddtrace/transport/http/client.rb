@@ -1,11 +1,4 @@
-require 'ddtrace/encoding'
-require 'ddtrace/version'
-
-require 'ddtrace/transport/traces'
-require 'ddtrace/transport/http/api'
-require 'ddtrace/transport/http/api_map'
-require 'ddtrace/transport/http/endpoint'
-
+require 'ddtrace/transport/http/env'
 require 'ddtrace/transport/http/compatibility'
 
 module Datadog
@@ -16,42 +9,20 @@ module Datadog
         include Compatibility
 
         attr_reader \
-          :service,
           :apis,
-          :active_api,
-          :headers
+          :active_api
 
-        DEFAULT_APIS = APIMap[
-          V4 = 'v0.4'.freeze => API.new(
-            Transport::Traces::Parcel => TracesEndpoint.new('/v0.4/traces'.freeze, Encoding::MsgpackEncoder)
-          ),
-          V3 = 'v0.3'.freeze => API.new(
-            Transport::Traces::Parcel => TracesEndpoint.new('/v0.3/traces'.freeze, Encoding::MsgpackEncoder)
-          ),
-          V2 = 'v0.2'.freeze => API.new(
-            Transport::Traces::Parcel => TracesEndpoint.new('/v0.2/traces'.freeze, Encoding::JSONEncoder)
-          )
-        ].with_fallbacks(V4 => V3, V3 => V2).freeze
+        def initialize(apis, active_api)
+          @apis = apis
 
-        def initialize(service, options = {})
-          @service = service
-          @apis = options[:apis] || DEFAULT_APIS
-
-          # Select active API
-          @active_api = apis[options.fetch(:api_version, V4)]
-          raise UnknownApiVersion if active_api.nil?
-
-          # Set headers
-          @headers = {
-            'Datadog-Meta-Lang' => 'ruby',
-            'Datadog-Meta-Lang-Version' => RUBY_VERSION,
-            'Datadog-Meta-Lang-Interpreter' => RUBY_ENGINE,
-            'Datadog-Meta-Tracer-Version' => Datadog::VERSION::STRING
-          }.merge(options.fetch(:headers, {}))
+          # Activate initial API
+          raise UnknownApiVersion unless apis.key?(active_api)
+          @active_api = apis[active_api]
         end
 
-        def deliver(parcel)
-          response = active_api.deliver(service, parcel, headers: headers)
+        def deliver(request)
+          env = build_env(request)
+          response = active_api.call(env)
 
           # If API should be downgraded, downgrade and try again.
           if downgrade?(response)
@@ -60,6 +31,10 @@ module Datadog
           end
 
           response
+        end
+
+        def build_env(request)
+          Env.new(request)
         end
 
         def downgrade?(response)
