@@ -82,7 +82,6 @@ elsif Gem::Version.new('1.9.3') <= Gem::Version.new(RUBY_VERSION) \
       gem 'rake', '< 12.3'
       gem 'redis', '< 4.0'
       gem 'rest-client', '< 2.0'
-      gem 'typhoeus', '< 2.0'
       gem 'resque', '< 2.0'
       gem 'sequel', '~> 4.0', '< 4.37'
       gem 'sidekiq', '~> 3.5.4'
@@ -90,6 +89,7 @@ elsif Gem::Version.new('1.9.3') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
+      gem 'typhoeus'
     end
   end
 elsif Gem::Version.new('2.0.0') <= Gem::Version.new(RUBY_VERSION) \
@@ -175,6 +175,7 @@ elsif Gem::Version.new('2.0.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
+      gem 'typhoeus'
     end
   end
 elsif Gem::Version.new('2.1.0') <= Gem::Version.new(RUBY_VERSION) \
@@ -281,6 +282,7 @@ elsif Gem::Version.new('2.1.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
+      gem 'typhoeus'
     end
   end
 elsif Gem::Version.new('2.2.0') <= Gem::Version.new(RUBY_VERSION) \
@@ -420,6 +422,7 @@ elsif Gem::Version.new('2.2.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
+      gem 'typhoeus'
     end
   end
 elsif Gem::Version.new('2.3.0') <= Gem::Version.new(RUBY_VERSION) \
@@ -559,6 +562,7 @@ elsif Gem::Version.new('2.3.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
+      gem 'typhoeus'
     end
   end
 elsif Gem::Version.new('2.4.0') <= Gem::Version.new(RUBY_VERSION)
@@ -592,6 +596,7 @@ elsif Gem::Version.new('2.4.0') <= Gem::Version.new(RUBY_VERSION)
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
+      gem 'typhoeus'
     end
   end
 end

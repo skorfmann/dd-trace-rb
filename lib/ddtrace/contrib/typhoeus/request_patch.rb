@@ -32,7 +32,7 @@ module Datadog
           include InstanceMethodsCompatibility unless Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.0.0')
 
           def run
-            if datadog_configuration[:tracer].enabled
+            if !datadog_configuration[:tracer].enabled
               return super()
             end
 
@@ -48,13 +48,13 @@ module Datadog
           end
 
           def datadog_tag_request(uri, span)
-            span.resource = method.to_s.upcase
+            span.resource = options.fetch(:method, :get).to_s.upcase
 
             # Set analytics sample rate
             Contrib::Analytics.set_sample_rate(span, analytics_sample_rate) if analytics_enabled?
 
             span.set_tag(Datadog::Ext::HTTP::URL, uri.path)
-            span.set_tag(Datadog::Ext::HTTP::METHOD, method.to_s.upcase)
+            span.set_tag(Datadog::Ext::HTTP::METHOD, options.fetch(:method, :get).to_s.upcase)
             span.set_tag(Datadog::Ext::NET::TARGET_HOST, uri.host)
             span.set_tag(Datadog::Ext::NET::TARGET_PORT, uri.port)
           end
@@ -96,8 +96,8 @@ module Datadog
 
           def set_span_error_message(span, message)
             # Sets span error from message, in case there is no exception available
-            span.status = Ext::Errors::STATUS
-            span.set_tag(Ext::Errors::MSG, message)
+            span.status = Datadog::Ext::Errors::STATUS
+            span.set_tag(Datadog::Ext::Errors::MSG, message)
           end
 
           def datadog_configuration
