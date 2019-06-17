@@ -85,7 +85,8 @@ namespace :spec do
     :sidekiq,
     :sinatra,
     :sucker_punch,
-    :shoryuken
+    :shoryuken,
+    :typhoeus
   ].each do |contrib|
     RSpec::Core::RakeTask.new(contrib) do |t, args|
       t.pattern = "spec/ddtrace/contrib/#{contrib}/**/*_spec.rb"
