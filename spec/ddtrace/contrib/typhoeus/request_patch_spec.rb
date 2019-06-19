@@ -125,22 +125,25 @@ RSpec.describe Datadog::Contrib::Typhoeus::RequestPatch do
             expect(span.get_tag(Datadog::Ext::Errors::MSG)).to be_nil
           end
         end
+
+        context 'request timed out' do
+          before do
+            stub_request(:get, url).to_timeout
+            request
+          end
+
+          it 'has no status code set' do
+            expect(span.get_tag(Datadog::Ext::HTTP::STATUS_CODE)).to be_nil
+          end
+
+          it 'has error set' do
+            expect(span.get_tag(Datadog::Ext::Errors::MSG)).to eq('Request has timed out')
+          end
+        end
       end
     end
 
     it_behaves_like 'instrumented request'
-
-    # context 'with Hydra request' do
-    #   subject(:request) {
-    #     hydra = Typhoeus::Hydra.hydra
-    #     request = Typhoeus::Request.new(url)
-    #     hydra.queue(request)
-    #     hydra.run
-    #     request.response
-    #   }
-    #
-    #   it_behaves_like 'instrumented request'
-    # end
 
     context 'distributed tracing default' do
       it_behaves_like 'instrumented request'

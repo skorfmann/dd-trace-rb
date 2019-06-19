@@ -48,13 +48,14 @@ module Datadog
           end
 
           def datadog_tag_request(uri, span)
-            span.resource = options.fetch(:method, :get).to_s.upcase
+            method = options.fetch(:method, :get).to_s.upcase
+            span.resource = "#{method} #{uri.path}"
 
             # Set analytics sample rate
             Contrib::Analytics.set_sample_rate(span, analytics_sample_rate) if analytics_enabled?
 
             span.set_tag(Datadog::Ext::HTTP::URL, uri.path)
-            span.set_tag(Datadog::Ext::HTTP::METHOD, options.fetch(:method, :get).to_s.upcase)
+            span.set_tag(Datadog::Ext::HTTP::METHOD, method)
             span.set_tag(Datadog::Ext::NET::TARGET_HOST, uri.host)
             span.set_tag(Datadog::Ext::NET::TARGET_PORT, uri.port)
           end
