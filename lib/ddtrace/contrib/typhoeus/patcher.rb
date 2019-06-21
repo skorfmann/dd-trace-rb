@@ -16,7 +16,9 @@ module Datadog
             require 'ddtrace/ext/app_types'
             require 'ddtrace/contrib/typhoeus/request_patch'
 
-            ::Typhoeus::Request.send(:include, RequestPatch)
+
+            ::Ethon::Easy.send(:include, RequestPatch)
+            #::Typhoeus::Request.send(:include, RequestPatch)
           end
         end
       end
