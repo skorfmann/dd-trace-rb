@@ -221,7 +221,7 @@ task :ci do
       sh 'bundle exec appraisal contrib-old rake spec:rest_client'
       sh 'bundle exec appraisal contrib-old rake spec:sequel'
       sh 'bundle exec appraisal contrib-old rake spec:sinatra'
-      sh 'bundle exec appraisal contrib-old rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib-old rake spec:ethon'
       # Rails minitests
       sh 'bundle exec appraisal rails30-postgres rake test:rails'
       sh 'bundle exec appraisal rails30-postgres rake test:railsdisableenv'
@@ -267,7 +267,7 @@ task :ci do
       sh 'bundle exec appraisal contrib-old rake spec:rest_client'
       sh 'bundle exec appraisal contrib-old rake spec:sequel'
       sh 'bundle exec appraisal contrib-old rake spec:sinatra'
-      sh 'bundle exec appraisal contrib-old rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib-old rake spec:ethon'
       # Rails minitests
       sh 'bundle exec appraisal rails30-postgres rake test:rails'
       sh 'bundle exec appraisal rails30-postgres rake test:railsdisableenv'
@@ -316,7 +316,7 @@ task :ci do
       sh 'bundle exec appraisal contrib-old rake spec:rest_client'
       sh 'bundle exec appraisal contrib-old rake spec:sequel'
       sh 'bundle exec appraisal contrib-old rake spec:sinatra'
-      sh 'bundle exec appraisal contrib-old rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib-old rake spec:ethon'
       # Rails minitests
       sh 'bundle exec appraisal rails30-postgres rake test:rails'
       sh 'bundle exec appraisal rails30-postgres rake test:railsdisableenv'
@@ -375,7 +375,7 @@ task :ci do
       sh 'bundle exec appraisal contrib rake spec:sequel'
       sh 'bundle exec appraisal contrib rake spec:shoryuken'
       sh 'bundle exec appraisal contrib rake spec:sinatra'
-      sh 'bundle exec appraisal contrib rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib rake spec:ethon'
       # Rails minitests
       sh 'bundle exec appraisal rails30-postgres rake test:rails'
       sh 'bundle exec appraisal rails30-postgres rake test:railsdisableenv'
@@ -442,7 +442,7 @@ task :ci do
       sh 'bundle exec appraisal contrib rake spec:sequel'
       sh 'bundle exec appraisal contrib rake spec:shoryuken'
       sh 'bundle exec appraisal contrib rake spec:sinatra'
-      sh 'bundle exec appraisal contrib rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib rake spec:ethon'
       # Rails minitests
       sh 'bundle exec appraisal rails30-postgres rake test:rails'
       sh 'bundle exec appraisal rails30-postgres rake test:railsdisableenv'
@@ -508,7 +508,7 @@ task :ci do
       sh 'bundle exec appraisal contrib rake spec:sequel'
       sh 'bundle exec appraisal contrib rake spec:shoryuken'
       sh 'bundle exec appraisal contrib rake spec:sinatra'
-      sh 'bundle exec appraisal contrib rake spec:typhoeus'
+      sh 'bundle exec appraisal contrib rake spec:ethon'
       # Rails minitests
       sh 'bundle exec rake benchmark'
     end
