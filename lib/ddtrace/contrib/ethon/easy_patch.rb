@@ -129,7 +129,7 @@ module Datadog
           def datadog_tag_request
             span = @datadog_span
             uri = URI.parse(url)
-            method = @datadog_method ? '#{@datadog_method} ' : ''
+            method = @datadog_method ? "#{@datadog_method} " : ""
             span.resource = "#{method}#{uri.path}"
 
             # Set analytics sample rate
