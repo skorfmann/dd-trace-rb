@@ -1,11 +1,11 @@
 require 'ddtrace/contrib/configuration/settings'
-require 'ddtrace/contrib/typhoeus/ext'
+require 'ddtrace/contrib/ethon/ext'
 
 module Datadog
   module Contrib
-    module Typhoeus
+    module Ethon
       module Configuration
-        # Custom settings for the RestClient integration
+        # Custom settings for the Ethon integration
         class Settings < Contrib::Configuration::Settings
           option  :analytics_enabled,
                   default: -> { env_to_bool(Ext::ENV_ANALYTICS_ENABLED, false) },

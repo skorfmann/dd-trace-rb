@@ -1,18 +1,24 @@
 require 'ddtrace/ext/net'
 require 'ddtrace/ext/distributed'
 require 'ddtrace/propagation/http_propagator'
-require 'ddtrace/contrib/typhoeus/ext'
+require 'ddtrace/contrib/ethon/ext'
 
 module Datadog
   module Contrib
-    module Typhoeus
-      # Typhoeus RequestPatch
-      module RequestPatch
+    module Ethon
+      # Ethon EasyPatch
+      module EasyPatch
         def self.included(base)
           if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.0.0')
             base.class_eval do
-              alias_method :execute_without_datadog, :execute
-              remove_method :execute
+              [:http_request, :set_attributes, :perform, :complete].each do |method|
+                alias_method "#{method.to_s}_without_datadog".to_sym, method
+                remove_method method
+              end
+
+              alias_method :headers_set_without_datadog, :headers=
+              remove_method :headers=
+
               include InstanceMethods
             end
           else
@@ -22,8 +28,24 @@ module Datadog
 
         # Compatibility shim for Rubies not supporting `.prepend`
         module InstanceMethodsCompatibility
-          def execute(&block)
-            execute_without_datadog(&block)
+          def http_request(url, action_name, options = {})
+            http_request_without_datadog(url, action_name, options)
+          end
+
+          def set_attributes(options)
+            set_attributes_without_datadog(options)
+          end
+
+          def headers=(headers)
+            headers_set_without_datadog(headers)
+          end
+
+          def perform
+            perform_without_datadog
+          end
+
+          def complete
+            complete_without_datadog
           end
         end
 
@@ -35,7 +57,7 @@ module Datadog
             return super unless datadog_configuration[:tracer].enabled
 
             # It's tricky to get HTTP method from libcurl
-            @datadog_action_name = action_name.to_s.upcase
+            @datadog_method = action_name.to_s.upcase
             super
           end
 
@@ -63,7 +85,7 @@ module Datadog
 
             if datadog_configuration[:distributed_tracing]
               Datadog::HTTPPropagator.inject!(@datadog_span.context, @datadog_original_headers)
-              super.headers = @datadog_original_headers
+              self.headers = @datadog_original_headers
             end
 
             super
@@ -126,7 +148,7 @@ module Datadog
           end
 
           def datadog_configuration
-            Datadog.configuration[:typhoeus]
+            Datadog.configuration[:ethon]
           end
 
           def analytics_enabled?

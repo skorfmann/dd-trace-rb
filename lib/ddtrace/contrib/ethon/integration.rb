@@ -1,21 +1,21 @@
 require 'ddtrace/contrib/integration'
-require 'ddtrace/contrib/typhoeus/configuration/settings'
-require 'ddtrace/contrib/typhoeus/patcher'
+require 'ddtrace/contrib/ethon/configuration/settings'
+require 'ddtrace/contrib/ethon/patcher'
 
 module Datadog
   module Contrib
-    module Typhoeus
-      # Description of Typhoeus integration
+    module Ethon
+      # Description of Ethon integration
       class Integration
         include Contrib::Integration
-        register_as :typhoeus
+        register_as :ethon
 
         def self.version
-          Gem.loaded_specs['typhoeus'] && Gem.loaded_specs['typhoeus'].version
+          Gem.loaded_specs['ethon'] && Gem.loaded_specs['ethon'].version
         end
 
         def self.present?
-          super && defined?(::Typhoeus::Request)
+          super && defined?(::Ethon::Easy)
         end
 
         def self.compatible?

@@ -67,6 +67,7 @@ namespace :spec do
     :dalli,
     :delayed_job,
     :elasticsearch,
+    :ethon,
     :excon,
     :faraday,
     :grape,
@@ -85,8 +86,7 @@ namespace :spec do
     :sidekiq,
     :sinatra,
     :sucker_punch,
-    :shoryuken,
-    :typhoeus
+    :shoryuken
   ].each do |contrib|
     RSpec::Core::RakeTask.new(contrib) do |t, args|
       t.pattern = "spec/ddtrace/contrib/#{contrib}/**/*_spec.rb"
