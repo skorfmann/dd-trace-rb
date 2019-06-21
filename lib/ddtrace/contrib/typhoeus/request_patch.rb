@@ -31,25 +31,82 @@ module Datadog
         module InstanceMethods
           include InstanceMethodsCompatibility unless Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.0.0')
 
-          def run
-            if !datadog_configuration[:tracer].enabled
-              return super()
-            end
+          def http_request(url, action_name, options = {})
+            return super unless datadog_configuration[:tracer].enabled
 
-            uri = URI.parse(url)
-            datadog_trace_request(uri) do |span|
-              if datadog_configuration[:distributed_tracing]
-                options[:headers] ||= {}
-                Datadog::HTTPPropagator.inject!(span.context, options[:headers])
-              end
-
-              super()
-            end
+            # It's tricky to get HTTP method from libcurl
+            @datadog_action_name = action_name.to_s.upcase
+            super
           end
 
-          def datadog_tag_request(uri, span)
-            method = options.fetch(:method, :get).to_s.upcase
-            span.resource = "#{method} #{uri.path}"
+          def set_attributes(options)
+            return super unless datadog_configuration[:tracer].enabled
+
+            # Make sure headers= will get called
+            options[:headers] ||= {}
+            super options
+          end
+
+          def headers=(headers)
+            return super unless datadog_configuration[:tracer].enabled
+
+            # Store headers to call this method again when span is ready
+            headers ||= {}
+            @datadog_original_headers = headers
+            super headers
+          end
+
+          def perform
+            return super unless datadog_configuration[:tracer].enabled
+
+            datadog_start_span
+
+            if datadog_configuration[:distributed_tracing]
+              Datadog::HTTPPropagator.inject!(@datadog_span.context, @datadog_original_headers)
+              super.headers = @datadog_original_headers
+            end
+
+            super
+          end
+
+          def complete
+            return super unless datadog_configuration[:tracer].enabled
+
+            begin
+              response_options = mirror.options
+              response_code = (response_options[:response_code] || response_options[:code]).to_i
+              return_code = response_options[:return_code]
+              if return_code == :operation_timedout
+                set_span_error_message("Request has timed out")
+              elsif response_code == 0
+                message = return_code ? Ethon::Curl.easy_strerror(return_code) : "unknown reason"
+                set_span_error_message("Request has failed: #{message}")
+              else
+                @datadog_span.set_tag(Datadog::Ext::HTTP::STATUS_CODE, response_code)
+                if Datadog::Ext::HTTP::ERROR_RANGE.cover?(response_code)
+                  set_span_error_message("Request has failed with HTTP error: #{response_code}")
+                end
+              end
+            ensure
+              @datadog_span.finish
+              @datadog_span = nil
+            end
+            super
+          end
+
+          def datadog_start_span
+            @datadog_span = datadog_configuration[:tracer].trace(Ext::SPAN_REQUEST,
+              service: datadog_configuration[:service_name],
+              span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND)
+
+            datadog_tag_request
+          end
+
+          def datadog_tag_request
+            span = @datadog_span
+            uri = URI.parse(url)
+            method = @datadog_method ? '#{@datadog_method} ' : ''
+            span.resource = "#{method}#{uri.path}"
 
             # Set analytics sample rate
             Contrib::Analytics.set_sample_rate(span, analytics_sample_rate) if analytics_enabled?
@@ -60,45 +117,12 @@ module Datadog
             span.set_tag(Datadog::Ext::NET::TARGET_PORT, uri.port)
           end
 
-          def datadog_trace_request(uri)
-            span = datadog_configuration[:tracer].trace(Ext::SPAN_REQUEST,
-                                                        service: datadog_configuration[:service_name],
-                                                        span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND)
-
-            datadog_tag_request(uri, span)
-
-            yield(span).tap do |response|
-              # Verify return value is a response
-              # If so, add additional tags.
-              if response.is_a?(::Typhoeus::Response)
-                if response.timed_out?
-                  set_span_error_message(span, 'Request has timed out')
-                elsif response.code == 0
-                  set_span_error_message(span, "Request has failed: #{response.return_message}")
-                else
-                  span.set_tag(Datadog::Ext::HTTP::STATUS_CODE, response.code)
-                  if Datadog::Ext::HTTP::ERROR_RANGE.cover?(response.code)
-                    set_span_error_message(span,
-                      "Request has failed with HTTP error: #{response.code} (#{response.return_message})")
-                  end
-                end
-              end
-            end
-          rescue Exception => e
-            # rubocop:enable Lint/RescueException
-            span.set_error(e)
-
-            raise e
-          ensure
-            span.finish
-          end
-
           private
 
-          def set_span_error_message(span, message)
+          def set_span_error_message(message)
             # Sets span error from message, in case there is no exception available
-            span.status = Datadog::Ext::Errors::STATUS
-            span.set_tag(Datadog::Ext::Errors::MSG, message)
+            @datadog_span.status = Datadog::Ext::Errors::STATUS
+            @datadog_span.set_tag(Datadog::Ext::Errors::MSG, message)
           end
 
           def datadog_configuration
