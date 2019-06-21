@@ -80,14 +80,7 @@ module Datadog
 
           def perform
             return super unless datadog_configuration[:tracer].enabled
-
-            datadog_start_span
-
-            if datadog_configuration[:distributed_tracing]
-              Datadog::HTTPPropagator.inject!(@datadog_span.context, @datadog_original_headers)
-              self.headers = @datadog_original_headers
-            end
-
+            datadog_before_request
             super
           end
 
@@ -114,6 +107,15 @@ module Datadog
               @datadog_span = nil
             end
             super
+          end
+
+          def datadog_before_request
+            datadog_start_span
+
+            if datadog_configuration[:distributed_tracing]
+              Datadog::HTTPPropagator.inject!(@datadog_span.context, @datadog_original_headers)
+              self.headers = @datadog_original_headers
+            end
           end
 
           def datadog_start_span
