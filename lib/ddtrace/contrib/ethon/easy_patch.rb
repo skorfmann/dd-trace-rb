@@ -86,7 +86,6 @@ module Datadog
 
           def complete
             return super unless tracer_enabled?
-
             begin
               response_options = mirror.options
               response_code = (response_options[:response_code] || response_options[:code]).to_i
@@ -110,7 +109,11 @@ module Datadog
           end
 
           def datadog_before_request
-            datadog_start_span
+            @datadog_span = datadog_configuration[:tracer].trace(Ext::SPAN_REQUEST,
+              service: datadog_configuration[:service_name],
+              span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND)
+
+            datadog_tag_request
 
             if datadog_configuration[:distributed_tracing]
               Datadog::HTTPPropagator.inject!(@datadog_span.context, @datadog_original_headers)
@@ -118,13 +121,7 @@ module Datadog
             end
           end
 
-          def datadog_start_span
-            @datadog_span = datadog_configuration[:tracer].trace(Ext::SPAN_REQUEST,
-              service: datadog_configuration[:service_name],
-              span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND)
-
-            datadog_tag_request
-          end
+          private
 
           def datadog_tag_request
             span = @datadog_span
@@ -140,8 +137,6 @@ module Datadog
             span.set_tag(Datadog::Ext::NET::TARGET_HOST, uri.host)
             span.set_tag(Datadog::Ext::NET::TARGET_PORT, uri.port)
           end
-
-          private
 
           def set_span_error_message(message)
             # Sets span error from message, in case there is no exception available
