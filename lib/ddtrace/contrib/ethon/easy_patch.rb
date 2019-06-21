@@ -54,7 +54,7 @@ module Datadog
           include InstanceMethodsCompatibility unless Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.0.0')
 
           def http_request(url, action_name, options = {})
-            return super unless datadog_configuration[:tracer].enabled
+            return super unless tracer_enabled?
 
             # It's tricky to get HTTP method from libcurl
             @datadog_method = action_name.to_s.upcase
@@ -62,7 +62,7 @@ module Datadog
           end
 
           def set_attributes(options)
-            return super unless datadog_configuration[:tracer].enabled
+            return super unless tracer_enabled?
 
             # Make sure headers= will get called
             options[:headers] ||= {}
@@ -70,7 +70,7 @@ module Datadog
           end
 
           def headers=(headers)
-            return super unless datadog_configuration[:tracer].enabled
+            return super unless tracer_enabled?
 
             # Store headers to call this method again when span is ready
             headers ||= {}
@@ -79,13 +79,13 @@ module Datadog
           end
 
           def perform
-            return super unless datadog_configuration[:tracer].enabled
+            return super unless tracer_enabled?
             datadog_before_request
             super
           end
 
           def complete
-            return super unless datadog_configuration[:tracer].enabled
+            return super unless tracer_enabled?
 
             begin
               response_options = mirror.options
@@ -151,6 +151,10 @@ module Datadog
 
           def datadog_configuration
             Datadog.configuration[:ethon]
+          end
+
+          def tracer_enabled?
+            datadog_configuration[:tracer].enabled
           end
 
           def analytics_enabled?

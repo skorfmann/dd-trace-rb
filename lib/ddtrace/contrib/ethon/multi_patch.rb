@@ -34,12 +34,22 @@ module Datadog
 
           def add(easy)
             handles = super(easy)
-            if handles.nil? || !datadog_configuration[:tracer].enabled
+            if handles.nil? || !tracer_enabled?
               return handles
             end
 
             easy.datadog_before_request
             handles
+          end
+
+          private
+
+          def datadog_configuration
+            Datadog.configuration[:ethon]
+          end
+
+          def tracer_enabled?
+            datadog_configuration[:tracer].enabled
           end
         end
       end
