@@ -72,6 +72,7 @@ elsif Gem::Version.new('1.9.3') <= Gem::Version.new(RUBY_VERSION) \
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'hiredis'
       gem 'mongo', '< 2.5'
@@ -89,7 +90,6 @@ elsif Gem::Version.new('1.9.3') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end
@@ -159,6 +159,7 @@ elsif Gem::Version.new('2.0.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'hiredis'
       gem 'mongo', '< 2.5'
@@ -176,7 +177,6 @@ elsif Gem::Version.new('2.0.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end
@@ -266,6 +266,7 @@ elsif Gem::Version.new('2.1.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'hiredis'
       gem 'mongo', '< 2.5'
@@ -284,7 +285,6 @@ elsif Gem::Version.new('2.1.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
       gem 'timers', '< 4.2'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end
@@ -405,6 +405,7 @@ elsif Gem::Version.new('2.2.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'grape'
       gem 'graphql', '< 1.9.4'
@@ -425,7 +426,6 @@ elsif Gem::Version.new('2.2.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end
@@ -546,6 +546,7 @@ elsif Gem::Version.new('2.3.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'grape'
       gem 'graphql'
@@ -566,7 +567,6 @@ elsif Gem::Version.new('2.3.0') <= Gem::Version.new(RUBY_VERSION) \
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end
@@ -581,6 +581,7 @@ elsif Gem::Version.new('2.4.0') <= Gem::Version.new(RUBY_VERSION)
       gem 'delayed_job'
       gem 'delayed_job_active_record'
       gem 'elasticsearch-transport'
+      gem 'ethon'
       gem 'excon'
       gem 'grape'
       gem 'graphql'
@@ -601,7 +602,6 @@ elsif Gem::Version.new('2.4.0') <= Gem::Version.new(RUBY_VERSION)
       gem 'sinatra'
       gem 'sqlite3', '~> 1.3.6'
       gem 'sucker_punch'
-      gem 'ethon',
       gem 'typhoeus'
     end
   end

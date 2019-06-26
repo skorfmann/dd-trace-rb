@@ -1,13 +1,19 @@
 require 'spec_helper'
 require 'ddtrace'
-require 'typhoeus'
+require 'ethon'
 
-RSpec.describe Datadog::Contrib::Typhoeus::Patcher do
+RSpec.describe Datadog::Contrib::Ethon::Patcher do
   describe '.patch' do
-    it 'adds RequestPatch to ancestors of Request class' do
+    it 'adds EasyPatch to ancestors of Easy class' do
       described_class.patch
 
-      expect(Typhoeus::Request.ancestors).to include(Datadog::Contrib::Typhoeus::RequestPatch)
+      expect(Ethon::Easy.ancestors).to include(Datadog::Contrib::Ethon::EasyPatch)
+    end
+
+    it 'adds MultiPatch to ancestors of Multi class' do
+      described_class.patch
+
+      expect(Ethon::Multi.ancestors).to include(Datadog::Contrib::Ethon::MultiPatch)
     end
   end
 end

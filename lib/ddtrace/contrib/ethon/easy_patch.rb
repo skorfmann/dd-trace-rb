@@ -90,10 +90,8 @@ module Datadog
               response_options = mirror.options
               response_code = (response_options[:response_code] || response_options[:code]).to_i
               return_code = response_options[:return_code]
-              if return_code == :operation_timedout
-                set_span_error_message("Request has timed out")
-              elsif response_code == 0
-                message = return_code ? Ethon::Curl.easy_strerror(return_code) : "unknown reason"
+              if response_code == 0
+                message = return_code ? ::Ethon::Curl.easy_strerror(return_code) : "unknown reason"
                 set_span_error_message("Request has failed: #{message}")
               else
                 @datadog_span.set_tag(Datadog::Ext::HTTP::STATUS_CODE, response_code)
@@ -126,8 +124,8 @@ module Datadog
           def datadog_tag_request
             span = @datadog_span
             uri = URI.parse(url)
-            method = @datadog_method ? "#{@datadog_method} " : ""
-            span.resource = "#{method}#{uri.path}"
+            method = @datadog_method.to_s
+            span.resource = "#{method} #{uri.path}".lstrip
 
             # Set analytics sample rate
             Contrib::Analytics.set_sample_rate(span, analytics_sample_rate) if analytics_enabled?
