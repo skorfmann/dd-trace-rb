@@ -34,9 +34,7 @@ module Datadog
 
           def add(easy)
             handles = super(easy)
-            if handles.nil? || !tracer_enabled?
-              return handles
-            end
+            return handles if handles.nil? || !tracer_enabled?
 
             easy.datadog_before_request
             handles

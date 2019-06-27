@@ -12,7 +12,7 @@ module Datadog
           if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.0.0')
             base.class_eval do
               [:http_request, :set_attributes, :perform, :complete].each do |method|
-                alias_method "#{method.to_s}_without_datadog".to_sym, method
+                alias_method "#{method}_without_datadog".to_sym, method
                 remove_method method
               end
 
@@ -90,8 +90,8 @@ module Datadog
               response_options = mirror.options
               response_code = (response_options[:response_code] || response_options[:code]).to_i
               return_code = response_options[:return_code]
-              if response_code == 0
-                message = return_code ? ::Ethon::Curl.easy_strerror(return_code) : "unknown reason"
+              if response_code.zero?
+                message = return_code ? ::Ethon::Curl.easy_strerror(return_code) : 'unknown reason'
                 set_span_error_message("Request has failed: #{message}")
               else
                 @datadog_span.set_tag(Datadog::Ext::HTTP::STATUS_CODE, response_code)
@@ -107,9 +107,11 @@ module Datadog
           end
 
           def datadog_before_request
-            @datadog_span = datadog_configuration[:tracer].trace(Ext::SPAN_REQUEST,
+            @datadog_span = datadog_configuration[:tracer].trace(
+              Ext::SPAN_REQUEST,
               service: datadog_configuration[:service_name],
-              span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND)
+              span_type: Datadog::Ext::HTTP::TYPE_OUTBOUND
+            )
 
             datadog_tag_request
 
@@ -124,7 +126,7 @@ module Datadog
           def datadog_tag_request
             span = @datadog_span
             uri = URI.parse(url)
-            method = @datadog_method.to_s
+            method = defined?(@datadog_method) ? @datadog_method.to_s : ''
             span.resource = "#{method} #{uri.path}".lstrip
 
             # Set analytics sample rate
