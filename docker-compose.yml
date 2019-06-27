@@ -114,7 +114,7 @@ services:
       - gemfiles-2.2:/app/gemfiles
   tracer-2.3:
     image: datadog/docker-library:ddtrace_rb_2_3_7
-    command: /bin/bash   
+    command: /bin/bash
     depends_on:
       - ddagent
       - elasticsearch
@@ -136,8 +136,6 @@ services:
       - TEST_REDIS_HOST=redis
     stdin_open: true
     tty: true
-    ports:
-      - "127.0.0.1:12345:1234"
     volumes:
       - .:/app
       - bundle-2.3:/usr/local/bundle
@@ -170,9 +168,6 @@ services:
       - .:/app
       - bundle-2.4:/usr/local/bundle
       - gemfiles-2.4:/app/gemfiles
-    expose:
-      - "1234"
-      - "26162"
   ddagent:
     image: datadog/docker-dd-agent
     environment:
