@@ -11,13 +11,9 @@ module Datadog
         def self.included(base)
           if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.0.0')
             base.class_eval do
-              [:http_request, :set_attributes, :perform, :complete].each do |method|
-                alias_method "#{method}_without_datadog".to_sym, method
-                remove_method method
-              end
-
-              alias_method :headers_set_without_datadog, :headers=
-              remove_method :headers=
+              # Among the patched methods, only this one is defined on Easy class, others are included
+              alias_method :set_attributes_without_datadog, :set_attributes
+              remove_method :set_attributes
 
               include InstanceMethods
             end
@@ -28,24 +24,8 @@ module Datadog
 
         # Compatibility shim for Rubies not supporting `.prepend`
         module InstanceMethodsCompatibility
-          def http_request(url, action_name, options = {})
-            http_request_without_datadog(url, action_name, options)
-          end
-
           def set_attributes(options)
             set_attributes_without_datadog(options)
-          end
-
-          def headers=(headers)
-            headers_set_without_datadog(headers)
-          end
-
-          def perform
-            perform_without_datadog
-          end
-
-          def complete
-            complete_without_datadog
           end
         end
 
