@@ -9,29 +9,11 @@ module Datadog
       # Ethon EasyPatch
       module EasyPatch
         def self.included(base)
-          if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.0.0')
-            base.class_eval do
-              # Among the patched methods, only this one is defined on Easy class, others are included
-              alias_method :set_attributes_without_datadog, :set_attributes
-              remove_method :set_attributes
-
-              include InstanceMethods
-            end
-          else
-            base.send(:prepend, InstanceMethods)
-          end
-        end
-
-        # Compatibility shim for Rubies not supporting `.prepend`
-        module InstanceMethodsCompatibility
-          def set_attributes(options)
-            set_attributes_without_datadog(options)
-          end
+          base.send(:prepend, InstanceMethods)
         end
 
         # InstanceMethods - implementing instrumentation
         module InstanceMethods
-          include InstanceMethodsCompatibility unless Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.0.0')
 
           def http_request(url, action_name, options = {})
             return super unless tracer_enabled?
