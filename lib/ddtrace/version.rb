@@ -3,7 +3,7 @@ module Datadog
     MAJOR = 0
     MINOR = 27
     PATCH = 0
-    PRE = nil
+    PRE = 'pre'
 
     STRING = [MAJOR, MINOR, PATCH, PRE].compact.join('.')
   end

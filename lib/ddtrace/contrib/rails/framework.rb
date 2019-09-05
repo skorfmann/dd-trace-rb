@@ -51,7 +51,9 @@ module Datadog
             application: ::Rails.application,
             service_name: config[:service_name],
             middleware_names: config[:middleware_names],
-            distributed_tracing: config[:distributed_tracing]
+            distributed_tracing: config[:distributed_tracing],
+            request_queuing: true,
+            web_service_name: 'nginx'
           )
         end
 
